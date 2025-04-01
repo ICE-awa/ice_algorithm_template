@@ -316,41 +316,41 @@ std::cout << ans << endl;
 
 > 算法实现原理：
 >
-> ![](./img/prim-1.png)
+> <img src="./img/prim-1.png" width="300px"/>
 >
-> ![](./img/prim-2.png)
+> <img src="./img/prim-2.png" width="300px"/>
 >
 > 通过点1，对相邻点的dist进行更新，结果如下：
 >
-> ![](./img/prim-3.gif)
+> <img src="./img/prim-3.gif" width="300px"/>
 >
 > 将与1最近的点2加入生成树中
 >
-> ![](./img/prim-4.png)
+> <img src="./img/prim-4.png" width="300px"/>
 >
 > 此时用2来更新dist数组
 >
-> ![](./img/prim-5.gif)
+> <img src="./img/prim-5.gif" width="300px"/>
 >
 > 重复上述步骤，直到所有的点都加入到最小生成树中
 >
-> ![](./img/prim-6.png)
+> <img src="./img/prim-6.png" width="300px"/>
 >
-> ![](./img/prim-7.png)
+> <img src="./img/prim-7.png" width="300px"/>
 >
-> ![](./img/prim-8.png)
+> <img src="./img/prim-8.png" width="300px"/>
 >
-> ![](./img/prim-9.png)
+> <img src="./img/prim-9.png" width="300px"/>
 >
-> ![](./img/prim-10.png)
+> <img src="./img/prim-10.png" width="300px"/>
 >
-> ![](./img/prim-11.png)
+> <img src="./img/prim-11.png" width="300px"/>
 >
-> ![](./img/prim-12.png)
+> <img src="./img/prim-12.png" width="300px"/>
 >
-> ![](./img/prim-13.png)
+> <img src="./img/prim-13.png" width="300px"/>
 >
-> ![](./img/prim-14.png)
+> <img src="./img/prim-14.png" width="300px"/>
 
 ##### Kruskal
 
@@ -391,6 +391,20 @@ std::cout << ans << endl;
 > };
 > ```
 
+#### 单源最短路
+
+##### Dijkstra
+
+> 只适用于不含**负权边**的图
+
+
+
+##### SPFA
+
+> 只适用于不含**正权边**的图
+
+
+
 ### 数据结构
 
 <span id = "dsu"></span>
@@ -398,8 +412,6 @@ std::cout << ans << endl;
 #### 并查集
 
 > 例题：[P1536 村村通](https://www.luogu.com.cn/problem/P1536)
-
-<span id="SegmentTree"></span>
 
 ```cpp
 class DSU{
@@ -435,70 +447,80 @@ public:
 };
 ```
 
+
+
 #### 线段树
+
+<span id="SegmentTree"></span>
 
 ##### SegmentTree（不带LazyTag）
 
+###### Ice's线段树模板使用注意事项
+
 <span id="SegmentTree_notice"></span>
 
-> 注意此线段树下标**从1开始(1-based)**！！！
->
-> 有两种构造方式，方式一为直接指定大小
->
-> ```cpp
-> SegmentTree<Info> sgt(n);
-> ```
->
-> 调用的构造函数原型为
->
-> ```cpp
-> SegmentTree(int _n, Info _v = Info()){
-> 	init(_n, _v);
-> }
-> ```
->
-> 方式二为传入初始化数组以及大小（初始化数组长度任意，但是**一定要保证数据存在1-n！！**
->
-> ```cpp
-> std::vector<Info> a(n + 5);
-> for(int i = 1;i <= n;i++)
->   //此处对a进行输入
-> SegmentTree<Info> sgt(n, a);
-> ```
->
-> 调用的构造函数原型为
->
-> ```cpp
-> template<class T>
-> SegmentTree(int _n, std::vector<T> _init){
-> 	init(_n, _init);
-> }
-> ```
->
-> init函数为
->
-> ```cpp
-> template<class T>
-> void init(int _n, std::vector<T> _init){
-> 	n = _n;
-> 	info.resize((n << 2) + 5, Info());
-> 
-> 	std::function<void(int, int, int)>build = [&](int k, int l, int r) -> void{
-> 		if(l == r){
-> 			info[k] = _init[l];
-> 			return ;
-> 		}
-> 		int mid = (l + r) >> 1;
-> 		build(lc(k), l, mid);
-> 		build(rc(k), mid + 1, r);
-> 		pushup(k);
-> 	};
-> 
-> 	build(1, 1, n);
-> }
-> ```
->
-> 上述两种方法传入的第一个参数都为n，指的是线段树处理的区间是**1～n**
+注意此线段树下标**从1开始(1-based)**，并且**操作区间为左闭右闭区间**！！！
+
+有两种构造方式，方式一为直接指定大小
+
+```cpp
+SegmentTree<Info> sgt(n);
+```
+
+调用的构造函数原型为
+
+```cpp
+SegmentTree(int _n, Info _v = Info()){
+	init(_n, _v);
+}
+```
+
+方式二为传入初始化数组以及大小（初始化数组长度任意，但是**一定要保证数据存在1-n！！**
+
+```cpp
+std::vector<Info> a(n + 5);
+for(int i = 1;i <= n;i++)
+  //此处对a进行输入
+SegmentTree<Info> sgt(n, a);
+```
+
+调用的构造函数原型为
+
+```cpp
+template<class T>
+SegmentTree(int _n, std::vector<T> _init){
+	init(_n, _init);
+}
+```
+
+init函数为
+
+```cpp
+template<class T>
+void init(int _n, std::vector<T> _init){
+	n = _n;
+	info.resize(4 * n + 5, Info());
+
+	std::function<void(int, int, int)>build = [&](int k, int l, int r) -> void{
+		if(l == r){
+			info[k] = _init[l];
+			return ;
+		}
+		int mid = (l + r) >> 1;
+		build(lc(k), l, mid);
+		build(rc(k), mid + 1, r);
+		pushup(k);
+	};
+
+	build(1, 1, n);
+}
+```
+
+上述两种方法传入的第一个参数都为n，指的是线段树处理的区间是**1～n**
+
+
+
+###### 线段树模板
 
 ```cpp
 template<class Info>
@@ -522,7 +544,7 @@ public:
 	template<class T>
 	void init(int _n, std::vector<T> _init){
 		n = _n;
-		info.resize((n << 2) + 5, Info());
+		info.resize(4 * n + 5, Info());
 
 		std::function<void(int, int, int)>build = [&](int k, int l, int r) -> void{
 			if(l == r){
@@ -590,43 +612,502 @@ Info operator+(const Info &a, const Info &b){
 
 > 在使用此线段树前，请确保你已经看过了[Ice's线段树模板使用注意事项](#SegmentTree_notice)
 >
-> 例如我需要修改单点的值，查询区间gcd以及区间和，示例为：
->
-> ```cpp
-> struct Info {
-> 	int x, d;
-> 	Info(int x = 0) : x(x), d(x) {}
-> };
-> 
-> Info operator+(const Info &a, const Info &b){
-> 	Info c;
-> 	c.x = a.x + b.x;
-> 	c.d = gcd(a.d, b.d);
-> 	return c;
-> }
-> 
-> std::vector<Info> a(n + 5);
-> for(int i = 1;i <= n;i++){
-> 	int x;
-> 	std::cin >> x;
-> 	a[i] = Info(x);
-> }
-> SegmentTree<Info> sgt(n, a);
-> while(m--){
->   //此处当opt为1时，向第x位的数字+y
->   //当opt为2时，查询[x, y]的gcd和元素和
-> 	int opt, x, y;
-> 	std::cin >> opt >> x >> y;
-> 	if(opt == 1){
-> 		sgt.update(x, Info(a[x].x += y));
-> 	}else std::cout << sgt.query(x, y).x << " " << sgt.query(x, y).d << endl;
-> }
-> ```
+> > 即此Tag的SegmentTree下面的灰色文字部分，这部分讲了此线段树初始化的方式以及传入的参数，并且说明了此线段树为**1-based**
+
+
+
+###### Info类型变量的书写规则以及Info重载运算符的方法
+
+Info结构体内定义的为你想要线段树能操作的变量，例如区间元素和sum，元素区间的最大值mx，区间最小值mn等
+
+Info重载的运算符即你希望**pushup**的规则
+
+例如常规线段树当中的
+
+```cpp
+struct Node{
+  int sum, mx, mn;
+}t[maxn * 4];
+//....
+void pushup(int k){
+  t[k].sum = t[k << 1].sum + t[k << 1 | 1].sum;
+  t[k].mx = std::max(t[k << 1].mx, t[k << 1 | 1].mx);
+  t[k].mn = std::min(t[k << 1].mn, t[k << 1 | 1].mn);
+}
+```
+
+在此板子中需要这样写：
+
+```cpp
+struct Info{
+  int sum, mx, mn;
+  Info(): sum(0), mx(0), mn(0) {}
+  Info(int x): sum(x), mx(x), mn(x) {}
+};
+
+Info operator+(const Info &a, const Info &b){
+  Info c;
+  c.sum = a.sum + b.sum;
+  c.mx = std::max(a.mx, b.mx);
+  c.mn = std::min(a.mn, b.mn);
+  return c;
+}
+```
+
+
+
+###### update函数（单点修改）
+
+<span id="segment_tree_update"></span>
+
+其中，**update函数**为**单点**修改，有两种使用方式
+
+第一种，直接指定需要操作的**下标x(1-based)**和需要**修改为的Info_val（不是相加，而是直接修改成）**
+
+```cpp
+SegmentTree<Info> sgt(n);
+sgt.update(index, Info_val);
+```
+
+**如果想要相加，例如想要将index的值加上y，则需要如此操作：**
+
+```cpp
+struct Info{
+  //....
+  Info(int x = 0): x(x) {}
+}
+update(index, Info(a[index].val += val));
+```
+
+第二种，按照常规线段树的update，传入根，线段树左右区间，需要修改的下标，需要**修改为的Info_val**
+
+```cpp
+SegmentTree<Info> sgt(n);
+sgt.update(1, 1, n, index, Info_val);
+```
+
+若想想加，则按照上面的方法进行操作
+
+
+
+###### query函数（区间查询）
+
+对于**query**函数，可以进行区间查询，有两种使用方式
+
+第一种，直接指定需要查询的左右区间l，r，返回**Info类型变量**
+
+```cpp
+SegmentTree<Info> sgt(n);
+Info ans = sgt.query(l, r);
+```
+
+第二种，按照常规线段树的query，传入根，线段树左右区间，需要查询的左右区间l，r，返回**Info类型变量**
+
+```cpp
+SegmentTree<Info> sgt(n);
+Info ans = sgt.query(1, 1, n, l, r);
+```
+
+
+
+###### 使用示例
+
+例如我需要修改单点的值，查询区间gcd以及区间和，示例为：
+
+```cpp
+struct Info {
+	int x, d;
+	Info(int x = 0) : x(x), d(x) {}
+};
+ 
+Info operator+(const Info &a, const Info &b){
+	Info c;
+	c.x = a.x + b.x;
+	c.d = gcd(a.d, b.d);
+	return c;
+}
+ 
+std::vector<Info> a(n + 5);
+for(int i = 1;i <= n;i++){
+	int x;
+	std::cin >> x;
+	a[i] = Info(x);
+}
+SegmentTree<Info> sgt(n, a);
+while(m--){
+//此处当opt为1时，向第x位的数字+y
+//当opt为2时，查询[x, y]的gcd和元素和
+	int opt, x, y;
+	std::cin >> opt >> x >> y;
+	if(opt == 1){
+		sgt.update(x, Info(a[x].x += y));
+	}else std::cout << sgt.query(x, y).x << " " << sgt.query(x, y).d << endl;
+}
+```
+
+
 
 ##### LazySegmentTree（带LazyTag）
 
-```cpp
+###### Ice's懒标记线段树模板使用注意事项
 
+<span id="Lazy_SegmentTree_notice"></span>
+
+注意此线段树下标**从1开始(1-based)**，并且**操作区间为左闭右闭区间**！！！
+
+有两种构造方式，方式一为直接指定大小
+
+```cpp
+LazySegmentTree<Info, Tag> lsgt(n);
+```
+
+调用的构造函数原型为
+
+```cpp
+LazySegmentTree(int _n, Info _v = Info()){
+	init(_n, _v);
+}
+```
+
+方式二为传入初始化数组以及大小（初始化数组长度任意，但是**一定要保证数据存在1-n！！**
+
+```cpp
+std::vector<Info> a(n + 5);
+for(int i = 1;i <= n;i++)
+//此处对a进行输入
+LazySegmentTree<Info, Tag> lsgt(n, a);
+```
+
+调用的构造函数原型为
+
+```cpp
+template<class T>
+LazySegmentTree(int _n, std::vector<T> _init){
+	init(_n, _init);
+}
+```
+
+init函数为
+
+```cpp
+template<class T>
+void init(int _n, std::vector<T> _init){
+	n = _n;
+	info.resize(4 * n + 5, Info());
+	tag.resize(4 * n + 5, Tag());
+	std::function<void(int, int, int)>build = [&](int k, int l, int r) -> void{
+		if(l == r){
+			info[k] = Info(_init[l], l, l);
+			return ;
+		}
+		int mid = (l + r) >> 1;
+		build(lc(k), l, mid);
+		build(rc(k), mid + 1, r);
+		pushup(k);
+	};
+  
+	build(1, 1, n);
+}
+```
+
+上述两种方法传入的第一个参数都为n，指的是线段树处理的区间是**1～n**
+
+
+
+###### 懒线段树板子
+
+```cpp
+template<class Info, class Tag>
+class LazySegmentTree{
+	#define lc(x) (x << 1)
+	#define rc(x) (x << 1 | 1)
+private:
+	int n;
+	std::vector<Info> info;
+	std::vector<Tag> tag;
+public:
+	LazySegmentTree(int _n, Info _v = Info()){
+		init(_n, _v);
+	}
+
+	template<class T>
+	LazySegmentTree(int _n, std::vector<T> _init){
+		init(_n, _init);
+	}
+
+	//若_init大小为n+5，则需要传入题目长度n，以及_init
+	template<class T>
+	void init(int _n, std::vector<T> _init){
+		n = _n;
+		info.resize(4 * n + 5, Info());
+		tag.resize(4 * n + 5, Tag());
+		std::function<void(int, int, int)>build = [&](int k, int l, int r) -> void{
+			if(l == r){
+				info[k] = _init[l];
+				return ;
+			}
+			int mid = (l + r) >> 1;
+			build(lc(k), l, mid);
+			build(rc(k), mid + 1, r);
+			pushup(k);
+		};
+
+		build(1, 1, n);
+	}
+
+	//可以直接传入n的大小
+	void init(int _n, Info _v = Info()){
+		init(_n, std::vector<Info>(_n + 5, _v));
+	}
+
+	void pushup(int k){
+		info[k] = info[lc(k)] + info[rc(k)];
+	}
+
+	void apply(int k, const Tag &v){
+		info[k].apply(v);
+		tag[k].apply(v);
+	}
+
+	void pushdown(int k){
+		apply(lc(k), tag[k]);
+		apply(rc(k), tag[k]);
+		tag[k] = Tag();
+	}
+
+	//单点修改
+	void update(int k, int l, int r, int x, const Info &v){
+		if(l == r){
+			info[k] = v;
+			return ;
+		}
+		int mid = (l + r) >> 1;
+		pushdown(k);
+		if(x <= mid)update(lc(k), l, mid, x, v);
+		else update(rc(k), mid + 1, r, x, v);
+		pushup(k);
+	}
+
+	void update(int k, const Info &v){
+		update(1, 1, n, k, v);
+	}
+
+	Info query(int k, int l, int r, int x, int y){
+		if(l > y || r < x)return Info();
+		if(x <= l && r <= y)return info[k];
+		int mid = (l + r) >> 1;
+		pushdown(k);
+		return query(lc(k), l, mid, x, y) + query(rc(k), mid + 1, r, x, y);
+	}
+
+	Info query(int l, int r){
+		return query(1, 1, n, l, r);
+	}
+
+	void Apply(int k, int l, int r, int x, int y, const Tag &v){
+		if(l > y || r < x)return ;
+		if(x <= l && r <= y){
+			apply(k, v);
+			return ;
+		}
+		int mid = (l + r) >> 1;
+		pushdown(k);
+		Apply(lc(k), l, mid, x, y, v);
+		Apply(rc(k), mid + 1, r, x, y, v);
+		pushup(k);
+	}
+
+	void Apply(int l, int r, const Tag &v){
+		return Apply(1, 1, n, l, r, v);
+	}
+
+	#undef lc(k)
+	#undef rc(k)
+};
+
+struct Tag{
+	//定下要放什么标记
+	void apply(Tag t){
+		//怎么用父节点的标记更新儿子的标记
+	}
+};
+
+struct Info {
+	//在此处存放变量
+	void apply(Tag t){
+		//怎么用父节点的标记更新儿子存储的信息
+	}
+};
+
+Info operator+(const Info &a, const Info &b){
+	Info c;
+  //在此处重载规则
+  return c;
+}
+```
+
+> 在使用此线段树前，请确保你已经看过了[Ice's懒标记线段树模板使用注意事项](#Lazy_SegmentTree_notice)
+>
+> > 即此Tag的LazySegmentTree下面的灰色文字部分，这部分讲了此线段树初始化的方式以及传入的参数，并且说明了此线段树为**1-based**
+>
+> 此懒线段树仍然保留了单点修改，其中**update函数**为**单点**修改，使用方式与上面的[线段树使用方式](#segment_tree_update)一样
+
+
+
+###### Info变量以及Tag变量的书写规则，以及Info运算符重载的书写规则
+
+Info重载的运算符即你希望**pushup**的规则
+
+Tag结构体中，重载的apply函数为你希望**pushdown**的规则
+
+Info结构体中，重载的apply函数为你希望**pushdown**的规则
+
+并且Tag和Info结构题中重载的apply函数，是以**子结点**为当前变量(this)，**父结点**为传入的Tag t
+
+例如对于常规线段树，sum为区间和，add为加的**tag**
+
+```cpp
+struct Node{
+  int l, r, add, sum;
+}t[maxn * 4];
+void pushup(int k){
+  t[k].sum = t[k << 1].sum + t[k << 1 | 1].sum;
+}
+void pushdown(int k){
+  t[k << 1].sum += t[k << 1].add * (t[k << 1].r - t[k << 1].l + 1);
+  t[k << 1].add += t[k].add;
+  t[k << 1 | 1].sum += t[k << 1 | 1].add * (t[k << 1 | 1].r - t[k << 1 | 1].l + 1);
+  t[k << 1 | 1].add += t[k].add;
+  t[k].tag = 0;
+}
+```
+
+在此板子中，则需要重载成这样（上面的sum变成此处的x）：
+
+```cpp
+struct Tag{
+	int add;
+	Tag(): add(0) {}
+	Tag(int a) : add(a) {}
+	void apply(Tag t){
+		add += t.add;
+	}
+};
+
+struct Info {
+	int x, l, r;
+	Info(): x(0), l(0), r(0) {}
+	Info(int val, int a, int b) : x(val), l(a), r(b) {}
+	void apply(Tag t){
+		x += (r - l + 1) * t.add;
+	}
+};
+
+Info operator+(const Info &a, const Info &b){
+		Info c;
+		c.x = a.x + b.x;
+		c.l = a.l;
+		c.r = b.r;
+		return c;
+}
+```
+
+
+
+###### query函数（区间查询）
+
+对于**query**函数，可以进行区间查询，有两种使用方式
+
+第一种，直接指定需要查询的左右区间l，r，返回**Info类型变量**
+
+```cpp
+LazySegmentTree<Info, Tag> lsgt(n);
+Info ans = lsgt.query(l, r);
+```
+
+第二种，按照常规线段树的query，传入根，线段树左右区间，需要查询的左右区间l，r，返回**Info类型变量**
+
+```cpp
+LazySegmentTree<Info, Tag> lsgt(n);
+Info ans = lsgt.query(1, 1, n, l, r);
+```
+
+
+
+###### Apply函数（区间修改）
+
+对于**Apply**函数，可以进行区间修改，有两种使用方式
+
+第一种，直接指定需要修改的左右区间l，r，以及**需要更改为的Tag类型变量**
+
+```cpp
+LazySegmentTree<Info, Tag> lsgt(n);
+lsgt.Apply(l, r, Tag_val);
+```
+
+第二种，按照常规线段树方法，传入根，线段树左右区间，需要查询的左右区间l，r，以及**需要更改为的Tag类型变量**
+
+```cpp
+LazySegmentTree<Info, Tag> lsgt(n);
+lsgt.Apply(1, 1, n, l, r, Tag_val);
+```
+
+
+
+###### 使用示例
+
+例如，我需要区间加以及区间求和，例题为[P3372 【模板】线段树 1](https://www.luogu.com.cn/problem/P3372)
+
+```cpp
+struct Tag{
+	int add;
+	Tag(): add(0) {}
+	Tag(int a) : add(a) {}
+	void apply(Tag t){
+		add += t.add;
+	}
+};
+
+struct Info {
+	int x, l, r;
+	Info(): x(0), l(0), r(0) {}
+	Info(int val, int a, int b) : x(val), l(a), r(b) {}
+	void apply(Tag t){
+		x += (r - l + 1) * t.add;
+	}
+};
+
+Info operator+(const Info &a, const Info &b){
+	Info c;
+		c.x = a.x + b.x;
+		c.l = a.l;
+		c.r = b.r;
+		return c;
+}
+
+signed ICE(){
+	int n, m;
+	std::cin >> n >> m;
+	std::vector<Info> a(n + 5);
+	for(int i = 1;i <= n;i++){
+		std::cin >> a[i].x;
+    a[i].l = a[i].r = 1;
+  }
+	LazySegmentTree<Info, Tag> LSGT(n, a);
+	while(m--){
+		int opt, x, y, k;
+		std::cin >> opt >> x >> y;
+		//当opt为1时，对区间[x, y]增加k
+		if(opt == 1){
+			std::cin >> k;
+			LSGT.Apply(x, y, Tag(k));
+		}else{
+			//当opt为2，求区间[x, y]的和
+			std::cout << LSGT.query(x, y).x << endl;
+		}
+	}
+	return awa;
+}
 ```
 
 #### 平衡树
@@ -868,7 +1349,7 @@ public:
 
 #### 树状数组
 
-###### 模板
+##### 模板
 
 ```cpp
 #define lowbit(x) (x & (-x))
@@ -900,7 +1381,9 @@ public:
 };
 ```
 
-###### 单点修改与区间求和
+
+
+##### 单点修改与区间求和
 
 ```cpp
 FenwickTree t(n);
@@ -916,7 +1399,9 @@ t.add(a, val);
 int res = t.sum(b) - t.sum(a - 1);
 ```
 
-###### 区间修改和单点求和
+
+
+##### 区间修改和单点求和
 
 ```cpp
 FenwickTree t(n);
@@ -936,6 +1421,200 @@ int res = t.sum(x);
 ```
 
 ### 杂项
+
+#### 随机数以及对拍
+
+> 头文件可以使用
+>
+> ```cpp
+> #include <bits/stdc++.h>
+> ```
+>
+> 但当万能头文件不能使用时，需要使用下述同文件：
+>
+> ```cpp
+> #include <iostream>
+> #include <chrono>
+> #include <thread>
+> #include <functional>
+> #include <random>
+> ```
+
+##### 随机数生成
+
+单调时间戳生成种子
+
+```cpp
+auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
+```
+
+使用PID生成种子
+
+```cpp
+auto thread_id = std::hash<std::thread::id>{}(std::this_thread::get_id());
+```
+
+使用高精度时钟时间戳
+
+```cpp
+auto time_seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+```
+
+
+
+##### 随机数生成代码
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+#define endl '\n'
+#define int long long
+#define awa 0
+typedef long long ll;
+
+signed ICE(){
+	static std::mt19937 gen([]{
+        auto time_seed = std::chrono::steady_clock::now().time_since_epoch().count();
+        auto thread_id = std::hash<std::thread::id>{}(std::this_thread::get_id());
+        auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        return seed + thread_id;
+    }());
+    std::uniform_int_distribution<int> dis(1, 200000);
+  	//在此处添加输出模块
+	return awa;
+}
+
+signed main(){
+	std::ios::sync_with_stdio(false),std::cin.tie(nullptr),std::cout.tie(nullptr);
+	int T = 1;
+	//std::cin >> T;
+	while(T--)ICE();
+	return 0;
+}
+```
+
+> 其中std::mt19937中的return可以是三个种子自由组合
+>
+> uniform_int_distribution会产生这个区间内的随机数
+>
+> 用法:
+>
+> ```cpp
+> std::cout << dis(gen()) << endl;
+> ```
+>
+> 且上述代码在windows, macOS, linux都可以使用
+
+
+
+##### 对拍脚本
+
+> 对于下述脚本，**xxx\_\_Generator.cpp是生成数据的，xxx\_\_Good.cpp是暴力的正确代码，xxx.cpp是需要对拍的代码**
+
+###### Linux/MacOS（check.sh)
+
+> 使用时，记得更改下面的文件名，此脚本用main.cpp作为样例
+>
+> 最后的结果**会输出到终端以及统计目录的result.txt**
+
+check.sh
+
+```bash
+#!/bin/bash
+
+# 记得更改下面文件名
+g++ -std=c++14 main__Generator.cpp -o generator
+g++ -std=c++14 main__Good.cpp -o good
+g++ -std=c++14 main.cpp -o test
+
+> result.txt
+epoch=1
+
+while true; do
+    echo "Testing epoch: $epoch"
+    ./generator > input.txt
+    ./good < input.txt > good.out
+    ./test < input.txt > test.out
+    
+    if ! diff good.out test.out > /dev/null; then
+        echo "WA found at epoch $epoch!" | tee -a result.txt
+        {
+            echo "INPUT:"
+            cat input.txt
+            echo "GOOD:"
+            cat good.out
+            echo "BAD:"
+            cat test.out
+        } >> result.txt
+        cat result.txt
+        break
+    fi
+    
+    echo "AC"
+    epoch=$((epoch+1))
+done
+```
+
+> 若提示
+>
+> ```shell
+> permission denied: ./check.sh
+> ```
+>
+> 则在终端中运行
+>
+> ```shell
+> chmod +x check.sh
+> ```
+
+
+
+###### Windows（check.bat）
+
+> 使用时，记得更改下面的文件名，此脚本用main.cpp作为样例
+>
+> 最后的结果**会输出到终端以及统计目录的result.txt**
+
+check.bat
+
+```bat
+@echo off
+setlocal enabledelayedexpansion
+
+:: 记得更改下面文件名
+g++ -std=c++14 main__Generator.cpp -o generator.exe
+g++ -std=c++14 main__Good.cpp -o good.exe
+g++ -std=c++14 main.cpp -o test.exe
+
+type nul > result.txt
+set epoch=1
+
+:loop
+echo Testing epoch: %epoch%
+generator.exe > input.txt
+good.exe < input.txt > good.out
+test.exe < input.txt > test.out
+
+fc /b good.out test.out >nul
+if errorlevel 1 (
+    echo WA found at epoch %epoch%! >> result.txt
+    echo WA found at epoch %epoch%!
+    echo INPUT: >> result.txt
+    type input.txt >> result.txt
+    echo GOOD: >> result.txt
+    type good.out >> result.txt
+    echo BAD: >> result.txt
+    type test.out >> result.txt
+    type result.txt
+    exit /b
+)
+
+echo AC
+set /a epoch+=1
+goto loop
+```
+
+
 
 #### 前缀和
 
@@ -1485,20 +2164,6 @@ for(auto [key, value] : a)
 > 注意，list**没有提供[]**
 
 ### TODO
-
-线段树
-
-对拍模板（随机数）
-
-> ```cpp
-> int rnd(int left, int right) {
->     if (left == right)
->         return left;
->     static std::mt19937 engine(std::random_device{}());
->     std::uniform_int_distribution<int> dist(left, right - 1);
->     return dist(engine);
-> }
-> ```
 
 Dijkstra
 
