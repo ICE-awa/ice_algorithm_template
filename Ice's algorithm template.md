@@ -343,26 +343,6 @@ auto euler_phi = [&](int n) -> void{
 
 
 
-#### min_25筛(😃😭😃😭)
-
-> 关于(😃😭😃😭)这个梗的来源可以去看24年广东省赛，大致就是THU出题，用这个当作签到题
->
-> 例题：[P5325 【模板】Min_25 筛](https://www.luogu.com.cn/problem/P5325) **黑题**😱
-
-**教程TODO**
-
-
-
-min_25筛可以在$O(\frac{n^{\frac{3}{4}}}{log \ n})$的时间复杂度下解决[积性函数](#jixinghanshu)的前缀和问题
-
-
-
-**模板**
-
-
-
-
-
 #### 快速幂
 
 ```cpp
@@ -761,7 +741,179 @@ for(int i = 0; i < len1; i++){
 **模板**
 
 ```cpp
+std::string s1, s2;    
+std::cin >> s1 >> s2;
+int len1 = s1.size(), len2 = s2.size();
+std::vector<int> nxt(len2 + 5);
+int j = 0;
+for(int i = 1; i < len2; i++){
+  while(j > 0 && s2[i] != s2[j])j = nxt[j - 1];  
+  if(s2[i] == s2[j])j++;  
+  nxt[i] = j;  
+}
+j = 0;
+for(int i = 0; i < len1; i++){
+  while(j > 0 && s1[i] != s2[j])j = nxt[j - 1];  
+  if(s2[j] == s1[i])j++;  
+  if(j == len2){  
+    std::cout << i - len2 + 2 << endl;    
+    j = nxt[j - 1];    
+  }  
+}
+```
 
+
+
+#### 字典树（Trie）
+
+> 例题：[P8306 【模板】字典树](https://www.luogu.com.cn/problem/P8306)
+
+**定义**
+
+Trie树，即字典树，是一种树型结构。用于统计和排序大量的字符串前缀来减少查询时间，最大限度地减少无谓的字符串比较。核心思想是**用空间换时间**，例如字符串的**公共前缀**来**降低查询时间的开销**以达到提高效率的目的。
+
+**性质**
+
+根节点**不包含字符**，除了根节点外的每一个节点都**只包含一个字符**
+
+从根节点到某一节点，路径上经过的字符连接起来，为该节点对应的字符串。
+
+每个节点的所有子节点**包含的字符都不相同。**
+
+**下图就是一颗字典树**
+
+<img src="./img/Trie.jpg" width="600px"/>
+
+**基本模板**
+
+```cpp
+class Trie{
+private:   
+  struct TrieNode{  
+    std::vector<int> child;    
+    int cnt; //记录经过该节点的模式串数量    
+    bool is_end; //若需要准确判断单词是否存在，则加上这个参数        
+    TrieNode(int child_sz) : child(child_sz, 0), cnt(0), is_end(false) {}    
+  };  
+  int sz;  
+  std::function<int(char)> mapper;//自定义映射函数  
+  std::vector<TrieNode> a;//结点数组
+public:  
+  Trie(int sz, std::function<int(char)> mapper) : sz(sz), mapper(mapper) {  
+    a.push_back(sz);//创建根节点    
+  }  
+  
+  void insert(const std::string &s) {  
+    int p = 0;//当前节点p，初始化为根节点    
+    for(char ch : s){    
+      int c = mapper(ch);      
+      a[p].cnt++;//经过当前节点的数量+1      
+      //如果当前节点没有对应的儿子      
+      if(!a[p].child[c]){      
+        //新建节点        
+        a.push_back(sz);        
+        a[p].child[c] = a.size() - 1;        
+      }      
+      p = a[p].child[c];      
+    }    
+    a[p].cnt++;//最后一个节点的计数+1    
+    a[p].is_end = true; //标记这个节点已经是这个单词的最后一个字母了    
+  }
+  
+  int count(const std::string &s) const {  
+    int p = 0;    
+    for(char ch : s){    
+      int c = mapper(ch);      
+      //如果还没有遍历完字符串，但是已经没有子节点了，说明并不存在      
+      if(!a[p].child[c])return 0;      
+      p = a[p].child[c];      
+    }    
+    return a[p].cnt;    
+  }
+  
+  bool is_in(const std::string &s) const {  
+    int p = 0;    
+    for(char ch : s){    
+      int c = mapper(ch);      
+      if(!a[p].child[c])return false;      
+      p = a[p].child[c];      
+    }    
+    return a[p].is_end;    
+  }
+};
+```
+
+> 要初始化trie树，需要传入两个参数sz，mapper
+>
+> sz是映射的个数，例如我字符串可能存在大写字母，小写字母，数字，那么总和为$26+26+10=62$
+>
+> mapper是映射函数，以下是例子：
+>
+> ```cpp
+> static auto mapper = [](char c) {        
+>   if(c >= 'A' && c <= 'Z') return c - 'A';  
+>   else if(c >= 'a' && c <= 'z') return 26 + (c - 'a'); 
+>   else return 52 + (c - '0');  
+> };
+> Trie trie(62, mapper);
+> ```
+
+**insert函数**
+
+函数原型为
+
+```cpp
+void insert(const std::string &s)
+```
+
+使用时，传入一个std::string类型的字符串
+
+```cpp
+trie.insert("ice");
+```
+
+
+
+**count函数**
+
+函数原型为
+
+```cpp
+int count(const std::string &s) const
+```
+
+返回值为这个字符串作为**前缀（包括最后一个字符）**出现的次数
+
+例如
+
+```cpp
+trie.insert("ice");
+trie.insert("iceice");
+trie.insert("iceiceic");
+trie.insert("eiceice");
+
+trie.count("ice");//返回3，满足条件的有前三行，第四个字符串"eiceice"不满足
+```
+
+
+
+**is_in函数**
+
+函数原型为
+
+```cpp
+bool is_in(const std::string &s) const
+```
+
+返回值为这个字符串**是否之前被插入进树中**
+
+例如
+
+```cpp
+trie.insert("iceice");
+
+trie.is_in("ice");//返回false
+trie.is_in("iceice");//返回tru
 ```
 
 
@@ -3001,32 +3153,34 @@ public:
 ##### 模板
 
 ```cpp
-#define lowbit(x) (x & (-x))
-class FenwickTree{
-private:
-  std::vector<int> t;
+class FenwickTree{    
+  #define lowbit(x) (x & (-x))
+private:    
+  std::vector<int> t;  
   int n;
-public:
-  void add(int i, int val){
-    while(i <= n){
-      t[i] += val;
-      i += lowbit(i);
-    }
+public:    
+  void add(int i, int val){  
+    while(i <= n){    
+      t[i] += val;      
+      i += lowbit(i);      
+    }    
+  }    
+  
+  int sum(int i){  
+    int res = 0;    
+    while(i > 0){    
+      res += t[i];      
+      i -= lowbit(i);      
+    }    
+    return res;    
+  }
+    
+  FenwickTree(int x){  
+    n = x;    
+    t.resize(n + 5);    
   }
   
-  int sum(int i){
-    int res = 0;
-    while(i > 0){
-      res += t[i];
-      i -= lowbit(i);
-    }
-    return res;
-  }
-  
-  FenwickTree(int x){
-    n = x;
-    t.resize(n + 5);
-  }
+  #undef lowbit(x)
 };
 ```
 
@@ -3073,7 +3227,32 @@ int res = t.sum(x);
 
 ##### 使用树状数组求逆序对
 
+> 例题：[P1908 逆序对](https://www.luogu.com.cn/problem/P1908)
+
 逆序对的定义为：对于任意 $(i, j), \ (i < j)$ ，都有 $a[i] > a[j]$ 
+
+```cpp
+int n, ans = 0;    
+std::cin >> n;
+//此处的PII记录的是{val, id},即{值, 下标}
+std::vector<PII> a(n + 5);
+for(int i = 1;i <= n;i++){
+  std::cin >> a[i].first;  
+  a[i].second = i;  
+}
+//优先以值进行排序，若值相同则按照id排序
+std::sort(a.begin() + 1, a.begin() + 1 + n, [&](const PII &x, const PII &y) -> bool{
+  if(x.first == y.first)return x.second < y.second;  
+  return x.first < y.first;  
+});
+FenwickTree t(n);
+//排序后，一边将此时的id放进去，一边统计之前有多少个id比我小的
+for(int i = 1;i <= n;i++){
+  t.add(a[i].second, 1);  
+  ans += i - t.sum(a[i].second);  
+}
+std::cout << ans << endl;
+```
 
 
 
@@ -3326,6 +3505,16 @@ std::cout << ans << endl;
 
 #### 快读&快写
 
+> 注意使用下面的函数时，**不要**关闭同步流
+>
+> 即代码中不要出现
+>
+> ```cpp
+> std::ios::sync_with_stdio(false),std::cin.tie(nullptr),std::cout.tie(nullptr);
+> ```
+
+##### 整数类型通用模板(int, long long, __int128)
+
 ```cpp
 template<typename T>
 inline T read(){
@@ -3360,6 +3549,48 @@ void write(T x){
 > __int128 x = read<__int128>()
 > write<__int128>(x);
 > ```
+>
+> 注意使用此函数时，**不要**关闭同步流
+
+
+
+##### 浮点数快读
+
+```cpp
+inline double readDouble(){    
+  double x = 0.0;  
+  int f = 1;  
+  char ch = getchar();  
+  //处理空白字符  
+  while(ch == ' ' || ch == '\n' || ch == '\t')ch = getchar();  
+  //处理符号  
+  if(ch == '-'){  
+    f = -1;    
+    ch = getchar();    
+  }else if(ch == '+')  
+    ch = getchar();    
+  //整数部分处理  
+  while(ch >= '0' && ch <= '9'){  
+    x = x * 10 + (ch - '0');    
+    ch = getchar();    
+  }  
+  //处理小数部分  
+  if(ch == '.'){  
+    ch = getchar();    
+    double div = 1.0;    
+    while(ch >= '0' && ch <= '9'){    
+      div *= 10.0;      
+      x += (ch - '0') / div;      
+      ch = getchar();      
+    }    
+  }  
+  return x * f;
+}
+```
+
+> 经过验证，此函数在读如1e4*100组数据时，比scanf快4倍，cin关闭同步流后超时
+>
+> 注意使用此函数时，**不要**关闭同步流
 
 
 
@@ -4159,17 +4390,9 @@ for(auto [key, value] : a)
 
 
 
-### TODO
-
-杂项
-
-模拟退火
-
-逆序对
 
 
-
-Beta版本待添加
+**Beta版本待添加**
 
 数据结构
 
@@ -4223,6 +4446,8 @@ splay的原理，[P3391 【模板】文艺平衡树](https://www.luogu.com.cn/pr
 
 重载运算符
 
+模拟退火
+
 
 
 计算几何
@@ -4235,9 +4460,16 @@ AC自动机
 
 后缀自动机
 
-字典树
-
 
 
 所有模板的教程
 
+
+
+min_25筛(😃😭😃😭)
+
+> 关于(😃😭😃😭)这个梗的来源可以去看24年广东省赛，大致就是THU出题，用这个当作签到题
+>
+> 例题：[P5325 【模板】Min_25 筛](https://www.luogu.com.cn/problem/P5325) **黑题**😱
+
+min_25筛可以在$O(\frac{n^{\frac{3}{4}}}{log \ n})$的时间复杂度下解决[积性函数](#jixinghanshu)的前缀和问题
