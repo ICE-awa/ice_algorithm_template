@@ -10,6 +10,35 @@ Alpha版本**有部分板块没有教程**，未来会给每个板块增加使�
 
 
 
+🧊的基础模板
+
+```cpp
+#include <bits/stdc++.h>
+#define endl '\n'
+#define int long long
+#define awa 0
+typedef long long ll;
+typedef std::pair<int, int> PII;
+typedef std::map<int, int> MII;
+
+signed ICE(){
+
+    return awa;
+}
+
+signed main(){
+    std::ios::sync_with_stdio(false),std::cin.tie(nullptr),std::cout.tie(nullptr);
+    int T = 1;
+    std::cin >> T;
+    while(T--)ICE();
+    return 0;
+}
+```
+
+
+
+
+
 ### 数学
 
 #### 排列组合
@@ -265,6 +294,8 @@ auto is_prime = [&](int x) -> bool{
 };
 ```
 
+
+
 <span id="eular_shai"></span>
 
 ##### 欧拉筛
@@ -309,6 +340,26 @@ auto euler_phi = [&](int n) -> void{
   }
 };
 ```
+
+
+
+#### min_25筛(😃😭😃😭)
+
+> 关于(😃😭😃😭)这个梗的来源可以去看24年广东省赛，大致就是THU出题，用这个当作签到题
+>
+> 例题：[P5325 【模板】Min_25 筛](https://www.luogu.com.cn/problem/P5325) **黑题**😱
+
+**教程TODO**
+
+
+
+min_25筛可以在$O(\frac{n^{\frac{3}{4}}}{log \ n})$的时间复杂度下解决[积性函数](#jixinghanshu)的前缀和问题
+
+
+
+**模板**
+
+
 
 
 
@@ -1816,7 +1867,7 @@ std::cout << ans << endl;
 
 > 例题：[P3381 【模板】最小费用最大流](https://www.luogu.com.cn/problem/P3381)
 
-给定网络$D=(V, E, C)$，每一条弧$(v_i, v_j)$上，除了已经给的最大容量$C_{ij}$以外，还给了一个单位流量的费用$cost(v_i, v_j) \geq 0$。最小费用最大流问题即使求一个**最大流f**，使流的**总输送费用最小**
+给定网络$D=(V, E, C)$，每一条弧$(v_i, v_j)$上，除了已经给的最大容量$C_{ij}$以外，还给了一个单位流量的费用$cost(v_i, v_j) \geq 0$。最小费用最大流问题即先保证**最大流 $f$ **的前提下，流的**总输送费用最小**
 
 
 
@@ -1914,8 +1965,87 @@ h[u] = h[u] + dis[u]
 $$
 其中$dis[u]$是当前调整后的费用下的最短距离，这保证后续边权调整后仍为负。
 
-```cpp
 
+
+**模板**
+
+```cpp
+//此处使用链式前向星存图
+struct edge{
+    int to, next, flow, cost;
+};
+//此处是重载运算符
+class cmp{
+public:    
+    bool operator()(const PII &x, const PII &y){  
+        return x.second > y.second;    
+        //因为重载的是堆，所以比较函数要从大到小，这样输出的结果为从小到大    
+    }
+};
+//n个点，m条边，源点为s，汇点为t，最小花费为minCost，最大流为maxFlow    
+int n, m, s, t, minCost = 0, maxFlow = 0, cnt = 0;
+std::cin >> n >> m >> s >> t;
+//h为势能，pre为前驱
+std::vector<int> head(n + 5, -1), h(n + 5), pre(n + 5);
+std::vector<edge> e(2 * m + 5);
+auto add = [&](int u, int v, int flow, int cost) -> void{
+  e[cnt].to = v;  
+  e[cnt].next = head[u];  
+  e[cnt].flow = flow;  
+  e[cnt].cost = cost;  
+  head[u] = cnt++;  
+};
+for(int i = 1;i <= m;i++){
+  int u, v, w, c;  
+  std::cin >> u >> v >> w >> c;  
+  add(u, v, w, c);  
+  add(v, u, 0, -c);//注意反向边  
+}
+auto MCMF = [&]() -> void{        
+  while(1){  
+    //此处的PII存放的是{u, dis}，即{点，距离}    
+    std::priority_queue<PII, std::vector<PII>, cmp> q;    
+    //cost为花费数组，vis为是否已经走过    
+    std::vector<int> cost(n + 5, 1e9), vis(n + 5);    
+    cost[s] = 0;    
+    q.push({s, 0});    
+    //Dijkstra过程    
+    while(!q.empty()){    
+      auto [u, c] = q.top();      
+      q.pop();      
+      vis[u] = 1;      
+      for(int i = head[u]; ~i; i = e[i].next){      
+        //此处的val是加上势能后的边权        
+        int v = e[i].to, val = e[i].cost + h[u] - h[v];        
+        //如果还有剩余容量，并且当前花费大于之前的花费加上 加上势能后的边权        
+        if(e[i].flow > 0 && cost[v] > c + val){        
+          cost[v] = c + val;//更新cost数组          
+          pre[v] = i;//记录前驱          
+          q.push({v, cost[v]});          
+        }        
+      }      
+    }    
+    //若没有到达汇点，则表示没有残量网络，退出函数    
+    if(cost[t] == 1e9) return ;    
+    //更新势能    
+    for(int i = 1; i <= n; i++)    
+      if(cost[i] != 1e9)h[i] += cost[i];      
+    //计算增广流量    
+    int curFlow = 1e9;    
+    for(int u = t; u != s; u = e[pre[u] ^ 1].to)    
+      curFlow = std::min(curFlow, e[pre[u]].flow);
+    //更新最大流和最小花费
+    maxFlow += curFlow;    
+    minCost += curFlow * h[t]; //此处的h[t]已经包含了调整后的总费用    
+    //更新网络    
+    for(int u = t; u != s; u = e[pre[u] ^ 1].to){    
+      e[pre[u]].flow -= curFlow;      
+      e[pre[u] ^ 1].flow += curFlow;      
+    }    
+  }   
+};
+MCMF();
+std::cout << maxFlow << " " << minCost << endl;
 ```
 
 
@@ -2938,6 +3068,14 @@ t.add(b + 1, -val);
 //求x位置的数字是多少
 int res = t.sum(x);
 ```
+
+
+
+##### 使用树状数组求逆序对
+
+逆序对的定义为：对于任意 $(i, j), \ (i < j)$ ，都有 $a[i] > a[j]$ 
+
+
 
 
 
@@ -4008,19 +4146,20 @@ for(auto [key, value] : a)
 
 
 
+### 竞赛前给自己的一些提示
+
+1. 若是发现题目**特别复杂**，**怎么做也做不出来**，但是**很多人都过了**，那要想一下是不是**读错题了**，**重读题去**！！！
+2. **switch case记得若传入int**，不要写类似这样的：**case '3'**，而是**case 3**！！！（尽量别用switch case）
+3. 若是死循环，记得看看**输入的 $n$ 和 $m$ 有没有反**！！链式前向星建反向边的时候，有没有**搞错顺序（例如 $(v, u)$ 写成 $(u, v)$ **！！
+4. 记得看数组的大小究竟是 $n$ **+ 5 **还是 $m$ **+ 5**！！！防止MLE
+5. 链式前向星建边的时候，**若需要建双向边**，**记得空间开两倍（2\*m+5)**
+6. 出不了题的时候，记得把题都看看，防止**榜被带歪**！！！！
+7. **注意特判**！！！
+8. 不会的构造或者思维题，可以**暴力找规律 或者直接观察样例找规律**！！！
+
+
+
 ### TODO
-
-图论
-
-最小费用最大流的Dijkstra实现
-
-
-
-数论 
-
-min25筛
-
-
 
 杂项
 
