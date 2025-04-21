@@ -1,6 +1,6 @@
-**当前最新普通版发布版本为v1.0.0-alpha.1，最新打印版为v1.0.0-alpha.1(总词数约2.5w(含代码))**
+**当前最新普通版发布版本为v1.0.0-alpha.2，最新打印版为v1.0.0-alpha.2(总词数约2.5w(含代码))**
 
-成品为 `template_v1.0.0-alpha.1.pdf` (请移步至[release](https://github.com/ICE-awa/ice_algorithm_template/releases/tag/v1.0.0-alpha.1)中下载)
+成品为 `template_v1.0.0-alpha.2.pdf` (请移步至[release](https://github.com/ICE-awa/ice_algorithm_template/releases/tag/v1.0.0-alpha.1)中下载)
 
 <span style="text-decoration:line-through">5月份之前应该都不会更新模板，要备战武汉邀请赛</span>
 
@@ -155,3 +155,9 @@
 * 2025/04/08 (v1.0.0-alpha.1)
 
 ​	发布了v1.0.0-alpha.1版本的模板
+
+* 2025/04/21 (v1.0.0-alpha.2)
+
+​	- 修复了并查集的小错误
+
+​	- 修复了组合数 C(n, k) 中 n < k 时会返回 1 而不是 0 的错误

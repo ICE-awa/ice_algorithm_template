@@ -48,6 +48,7 @@ signed main(){
 ```cpp
 template<typename T>
 T perm(T n, T k){
+  if(n < k)return 0;
 	T res = 1;
 	for(T i = 0; i < k; i++)
 		res *= (n - i);
@@ -62,6 +63,7 @@ T perm(T n, T k){
 ```cpp
 template<typename T>
 T comb(T n, T k){
+  if(n < k)return 0;
 	if(!k || k == n) return 1;
 	k = std::min(k, n - k);
 	T res = 1;
@@ -1333,7 +1335,7 @@ return awa;
 > 	//合并x y
 > 	void merge(int x, int y){
 > 		int cx = find(x), cy = find(y);
-> 		f[cy] = cx;
+> 		f[cx] = cy;
 > 		sz[cy] += sz[cx];
 > 	}
 > 	//判断x y是否属于一个联通块
@@ -2230,7 +2232,7 @@ public:
 	//合并x y
 	void merge(int x, int y){
 		int cx = find(x), cy = find(y);
-		f[cy] = cx;
+		f[cx] = cy;
 		sz[cy] += sz[cx];
 	}
 	//判断x y是否属于一个联通块
@@ -4387,8 +4389,6 @@ for(auto [key, value] : a)
 6. 出不了题的时候，记得把题都看看，防止**榜被带歪**！！！！
 7. **注意特判**！！！
 8. 不会的构造或者思维题，可以**暴力找规律 或者直接观察样例找规律**！！！
-
-
 
 
 
