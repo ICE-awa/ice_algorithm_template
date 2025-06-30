@@ -161,3 +161,8 @@
 ​	- 修复了并查集的小错误
 
 ​	- 修复了组合数 C(n, k) 中 n < k 时会返回 1 而不是 0 的错误
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ICE-awa/ice_algorithm_template&type=Date)](https://www.star-history.com/#ICE-awa/ice_algorithm_template&Date)
